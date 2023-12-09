@@ -1,0 +1,52 @@
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX APM using Dynatrace START XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+
+# Sign up in dynatrace with any new id
+#Go to hub in left and search for OneAgent
+  Select Linux, 
+  Generate Token
+  Copy token somewhere- dt0c01.QLQO3PRASS4DCXPMPUZOAZIS.O7RMKZIVCDK63YOTIKSM62UMDEQYPJZHWKE6PWDQNFUVZP4VD3L24MGGCDGZG6VP
+
+  Scroll down and copy which is there inside "Download the installer using this command on the target host." and paste it to the terminal.
+  Scroll down and copy which is there inside "Verify signature:" and paste it to the terminal.
+  Scroll down and copy which is there inside "Run the installer with root rights." and paste it to the terminal.
+
+  Now Reboot the machine(instance) from aws console.
+  Then again connect to the instance from the terminal.
+
+- kubeadm reset                                #have to reset and init because before this while doing ansible we have done kubadm reset in the last.
+- rm -rf $HOME/.kube
+- kubeadm init
+- mkdir -p $HOME/.kube
+- sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+- sudo chown $(id -u):$(id -g) $HOME/.kube/config
+- kubectl apply -f https://github.com/weaveworks/weave/releases/download/v2.8.1/weave-daemonset-k8s.yaml
+- kubectl get node  
+- kubectl describe node <name of node>
+- kubectl taint node <name of node> node-role.kubernetes.io/control-plane:NoSchedule-
+
+- cd Microservice1
+- kubectl apply -f microservice1-deployment.yaml
+-  kubectl get pod
+Now go to dynatrace and click of "Show Deployment Status"
+Now click on your host 
+Then scroll down to the process analysis and search for "flask microservice1" and then click on that.
+     Now you can monitor that things related to microservice1 pod deployment
+
+
+# trying to create some problem in host machine to view those problem in dynatrace
+- apt install stress
+- stress --cpu 4  #Keep it running for observing results in Dynatrace 
+
+Now go there in dynatrace and then go to the CPU section you will see CPU utilization will show some spikes.
+You can refresh again and again coz it take some time.
+
+
+
+# Delete the deployment
+- kubectl delete -f microservice1-deployment.yaml
+
+Now go and check for your microservice in dynatrace and u will see the availability is coming down slowly-slowly. 
+You can refresh again and again coz it take some time.
+
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX APM using Dynatrace END XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
